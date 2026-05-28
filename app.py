@@ -41,31 +41,31 @@ if user_query := st.chat_input("How do I make a perfect soufflé?"):
     st.chat_message("user").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
+    # React to user input
+if user_query := st.chat_input("How do I make a perfect soufflé?"):
+    # 1. Immediately display the user message and save it to history
+    st.chat_message("user").markdown(user_query)
+    st.session_state.messages.append({"role": "user", "content": user_query})
+
+    # 2. Check guardrails
     if is_out_of_scope(user_query):
-        response_text = GUARDRAIL_RESPONSE
+        response_text = "I'm sorry, I am Chef Alex, your culinary assistant. I can only help you with recipes, food, and cooking questions!"
     else:
         try:
-            messages_payload = [{"role": "system", "content": SYSTEM_PROMPT}]
-            for example in FEW_SHOT_EXAMPLES:
-                messages_payload.append(example)
-            for msg in st.session_state.messages:
-                messages_payload.append({"role": msg["role"], "content": msg["content"]})
-
+            # 3. Call the API using the correct variable name: user_query
             response = client.chat.completions.create(
-                model="gemini-2.5-flash",  # Using a highly stable model version
-                messages=[{"role": "system", "content": "You are Chef Alex..."},
-        {"role": "user", "content": prompt}]
+                model="gemini-2.5-flash",
+                messages=[
+                    {"role": "system", "content": "You are Chef Alex, a helpful and expert culinary assistant."},
+                    {"role": "user", "content": user_query}
+                ]
             )
             response_text = response.choices[0].message.content
         except Exception as e:
-            if "503" in str(e):
-                response_text = "Chef Remy's kitchen is packed with guests right now! 🍳 Please wait a moment and ask me again—the oven is warming back up!"
-            else:
-                response_text = f"An error occurred: {str(e)}"
+            response_text = f"An error occurred: {e}"
 
-    # 2. Display the assistant response and save it to history immediately
-    with st.chat_message("assistant"):
-        st.markdown(response_text)
+    # 4. Display the Chef's response and save it to history
+    st.chat_message("assistant").markdown(response_text)
     st.session_state.messages.append({"role": "assistant", "content": response_text})
 
 # Sidebar Feedback System
