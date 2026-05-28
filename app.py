@@ -54,7 +54,7 @@ if user_query := st.chat_input("How do I make a perfect soufflé?"):
             response = client.chat.completions.create(
                 model="gemini-2.5-flash",  # Using a highly stable model version
                 messages=[{"role": "system", "content": "You are Chef Alex..."},
-        {"role": "user", "content": user_input}]
+        {"role": "user", "content": prompt}]
             )
             response_text = response.choices[0].message.content
         except Exception as e:
