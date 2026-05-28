@@ -9,7 +9,7 @@ from prompts import SYSTEM_PROMPT, FEW_SHOT_EXAMPLES, GUARDRAIL_RESPONSE
 load_dotenv()
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("AIzaSyDmx98aXl-ArE6zrfuYtRDiEfsc2-SxZvM"),
+client = OpenAI(api_key=st.secrets["AIzaSyDmx98aXl-ArE6zrfuYtRDiEfsc2-SxZvM"],
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
                 )
 
