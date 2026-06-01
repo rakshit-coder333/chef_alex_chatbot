@@ -36,16 +36,12 @@ def is_out_of_scope(user_input):
 
 # React to user input
 # React to user input
-if user_query := st.chat_input("How do I make a perfect soufflé?"):
+if user_query := st.chat_input("How do I make a perfect soufflé?", key = "chef_chat_input"):
     # 1. Immediately display the user message and save it to history
     st.chat_message("user").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
-    # React to user input
-if user_query := st.chat_input("How do I make a perfect soufflé?"):
-    # 1. Immediately display the user message and save it to history
-    st.chat_message("user").markdown(user_query)
-    st.session_state.messages.append({"role": "user", "content": user_query})
+   
 
     # 2. Check guardrails
     if is_out_of_scope(user_query):
