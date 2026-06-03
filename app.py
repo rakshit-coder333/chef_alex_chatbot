@@ -1,6 +1,6 @@
 
 import streamlit as st
-from huggingface_hub import InferenceClient
+from openai import OpenAI
 
 # ==========================================
 # 1. Page Configuration & Setup
@@ -10,27 +10,23 @@ st.title("🍳 Chef Alex")
 st.write("Welcome! I am your personal culinary assistant. Ask me anything about recipes, cooking techniques, or food adjustments!")
 
 # ==========================================
-# 2. Initialize Hugging Face Client securely
+# 2. Initialize Secure Groq Client (Using OpenAI Library Format)
 # ==========================================
-# Fetching the token from your Streamlit Secrets dashboard
-hf_token = st.secrets["GEMINI_API_KEY"] 
-client = InferenceClient(token=hf_token)
+client = OpenAI(
+    api_key=st.secrets["GEMINI_API_KEY"],
+    base_url="https://api.groq.com/openai/v1"
+)
 
 # ==========================================
 # 3. Guardrail Logic (In-Scope vs Out-of-Scope)
 # ==========================================
 def is_out_of_scope(query):
-    # Convert query to lowercase to catch variations
     q = query.lower()
-    
-    # List of blocked keywords unrelated to cooking
     blocked_keywords = [
         "code", "python", "java", "javascript", "c++", "html", "css", 
         "programming", "software", "bug", "database", "git", "github",
         "terminal", "machine learning", "neural network", "framework"
     ]
-    
-    # Check if any blocked word is in the user's query
     for word in blocked_keywords:
         if word in q:
             return True
@@ -44,7 +40,7 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Hello! I am Chef Alex. What are we cooking today?"}
     ]
 
-# Display existing chat history
+# Display existing chat history (This will load perfectly now!)
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -62,10 +58,9 @@ if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_ch
         response_text = "I'm sorry, I am Chef Alex, your culinary assistant. I can only help you with recipes, food, and cooking questions!"
     else:
         try:
-            # Call Hugging Face API natively using a fast Llama 3 model
+            # Call Groq's high-speed engine
             response = client.chat.completions.create(
-                model="HuggingFaceH4/zephyr-7b-beta",
-               
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {"role": "system", "content": "You are Chef Alex, an expert, professional, and helpful culinary assistant."},
                     {"role": "user", "content": user_query}
