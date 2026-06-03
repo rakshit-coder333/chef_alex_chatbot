@@ -1,93 +1,81 @@
 
 import streamlit as st
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
-from prompts import SYSTEM_PROMPT, FEW_SHOT_EXAMPLES, GUARDRAIL_RESPONSE
+from huggingface_hub import InferenceClient
 
-# Load environment variables
-load_dotenv()
-
-# Initialize OpenAI client
-client = OpenAI(api_key=st.secrets["GEMINI_API_KEY"],
-                base_url="https://api-inference.huggingface.co/v1/"
-                )
-
+# ==========================================
+# 1. Page Configuration & Setup
+# ==========================================
 st.set_page_config(page_title="Chef Alex - Culinary Assistant", page_icon="🍳")
-st.title("🍳 Chef Alex: Your AI cuisine assistant")
-st.write("Welcome to my kitchen! Ask me for quick recipe tweaks, smart ingredient swaps, or cooking tips.")
+st.title("🍳 Chef Alex")
+st.write("Welcome! I am your personal culinary assistant. Ask me anything about recipes, cooking techniques, or food adjustments!")
 
-# Initialize session state for chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# ==========================================
+# 2. Initialize Hugging Face Client securely
+# ==========================================
+# Fetching the token from your Streamlit Secrets dashboard
+hf_token = st.secrets["GEMINI_API_KEY"] 
+client = InferenceClient(provider="hf-inference", token=hf_token)
 
-# Display previous chat messages
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-# Quick Guardrail Check
-def is_out_of_scope(user_input):
-    food_keywords = ["cook", "bake", "recipe", "food", "ingredient", "taste", "salt", "chicken", "boil", "fry", "substitute", "dish", "sauce"]
-    if not any(word in user_input.lower() for word in food_keywords):
-        if any(tech_word in user_input.lower() for tech_word in ["code", "python", "javascript", "bug", "software"]):
+# ==========================================
+# 3. Guardrail Logic (In-Scope vs Out-of-Scope)
+# ==========================================
+def is_out_of_scope(query):
+    # Convert query to lowercase to catch variations
+    q = query.lower()
+    
+    # List of blocked keywords unrelated to cooking
+    blocked_keywords = [
+        "code", "python", "java", "javascript", "c++", "html", "css", 
+        "programming", "software", "bug", "database", "git", "github",
+        "terminal", "machine learning", "neural network", "framework"
+    ]
+    
+    # Check if any blocked word is in the user's query
+    for word in blocked_keywords:
+        if word in q:
             return True
     return False
 
-# React to user input
-# React to user input
-if user_query := st.chat_input("How do I make a perfect soufflé?", key = "chef_chat_input"):
-    # 1. Immediately display the user message and save it to history
+# ==========================================
+# 4. Initialize Chat History
+# ==========================================
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Hello! I am Chef Alex. What are we cooking today?"}
+    ]
+
+# Display existing chat history
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# ==========================================
+# 5. React to User Input
+# ==========================================
+if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_chat_input"):
+    # Display user message and save to history
     st.chat_message("user").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
 
-   
-
-    # 2. Check guardrails
+    # Check Guardrails
     if is_out_of_scope(user_query):
         response_text = "I'm sorry, I am Chef Alex, your culinary assistant. I can only help you with recipes, food, and cooking questions!"
     else:
         try:
-            # 3. Call the API using the correct variable name: user_query
+            # Call Hugging Face API natively using a fast Llama 3 model
             response = client.chat.completions.create(
-                model="meta-llama/Llama-3.1-8B-Instruct",
+                model="meta-llama/Meta-Llama-3-8B-Instruct",
                 messages=[
-                    {"role": "system", "content": "You are Chef Alex, a helpful and expert culinary assistant."},
+                    {"role": "system", "content": "You are Chef Alex, an expert, professional, and helpful culinary assistant."},
                     {"role": "user", "content": user_query}
-                ]
+                ],
+                max_tokens=500
             )
             response_text = response.choices[0].message.content
         except Exception as e:
-            response_text = f"An error occurred: {e}"
+            response_text = f"An error occurred during connection: {e}"
 
-    # 4. Display the Chef's response and save it to history
-    st.chat_message("assistant").markdown(response_text)
+    # Display Chef response and save to history
+    with st.chat_message("assistant"):
+        st.markdown(response_text)
     st.session_state.messages.append({"role": "assistant", "content": response_text})
-
-# Sidebar Feedback System
-# Sidebar Layout: Chat History Log & Feedback
-st.sidebar.title("📜 Conversation Log")
-
-# Display a scannable list of user questions sent so far
-if st.session_state.messages:
-    user_queries = [msg["content"] for msg in st.session_state.messages if msg["role"] == "user"]
-    if user_queries:
-        for i, query in enumerate(user_queries, 1):
-            # Truncate long questions so they look neat in the sidebar
-            short_query = query if len(query) < 30 else query[:27] + "..."
-            st.sidebar.text(f"{i}. {short_query}")
-    
-    st.sidebar.markdown("---") # Visual separator line
-    
-    # Feedback Panel
-    st.sidebar.title("👍 Feedback")
-    st.sidebar.write("Rate the last response:")
-    col1, col2 = st.sidebar.columns(2)
-    with col1:
-        if st.button("Good"):
-            st.sidebar.success("Logged! Thanks!")
-    with col2:
-        if st.button("Bad"):
-            st.sidebar.error("Logged. We will optimize!")
-else:
-    st.sidebar.info("Your chat session history will appear here once you start messaging Chef Remy.")
