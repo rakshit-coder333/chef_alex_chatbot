@@ -7,6 +7,7 @@ from openai import OpenAI
 # ==========================================
 st.set_page_config(page_title="Chef Alex - Culinary Assistant", page_icon="🍳", layout="wide")
 st.title("🍳 Chef Alex")
+st.write("Hello! I am Chef Alex, an expert culinary consultant. Enter any recipe request, ingredient substitute, or cooking query below to begin.")
 
 # ==========================================
 # 2. Initialize Secure Groq Client
