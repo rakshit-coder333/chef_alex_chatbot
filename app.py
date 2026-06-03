@@ -14,7 +14,7 @@ st.write("Welcome! I am your personal culinary assistant. Ask me anything about 
 # ==========================================
 # Fetching the token from your Streamlit Secrets dashboard
 hf_token = st.secrets["GEMINI_API_KEY"] 
-client = InferenceClient(model="microsoft/Phi-3-mini-4k-instruct", token=hf_token)
+client = InferenceClient(token=hf_token)
 
 # ==========================================
 # 3. Guardrail Logic (In-Scope vs Out-of-Scope)
@@ -64,7 +64,8 @@ if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_ch
         try:
             # Call Hugging Face API natively using a fast Llama 3 model
             response = client.chat.completions.create(
-                
+                model="HuggingFaceH4/zephyr-7b-beta",
+               
                 messages=[
                     {"role": "system", "content": "You are Chef Alex, an expert, professional, and helpful culinary assistant."},
                     {"role": "user", "content": user_query}
