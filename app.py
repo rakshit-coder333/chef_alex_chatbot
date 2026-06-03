@@ -7,8 +7,72 @@ from openai import OpenAI
 # ==========================================
 st.set_page_config(page_title="Chef Alex - Culinary Assistant", page_icon="🍳", layout="wide")
 st.title("🍳 Chef Alex")
-st.write("Hello! I am Chef Alex, an expert culinary consultant. Enter any recipe request, ingredient substitute, or cooking query below to begin.")
-
+st.markdown("""
+    <div class="chef-card">
+        <h3 style='margin-top:0; color:#ff4b4b;'>Welcome to Chef Alex AI</h3>
+        <p style='margin:0; color:#b0b3b8; font-size: 15px; line-height: 1.5;'>
+            An intelligent, production-grade culinary engine. Ask me anything regarding recipes, 
+            ingredient alternatives, or kitchen techniques. Built-in system guardrails will automatically 
+            restrict non-culinary topics.
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+# ==========================================
+st.markdown("""
+    <style>
+    /* 1. Main Background and Base Typography */
+    .stApp {
+        background: linear-gradient(135deg, #1e1e24 0%, #121214 100%);
+        color: #f5f6f8;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    /* 2. Sleek Custom Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #1a1a22 !important;
+        border-right: 1px solid #2d2d38;
+    }
+    
+    /* 3. Style all Sidebar Action Buttons (Conversations & New Chat) */
+    div[data-testid="stSidebar"] button {
+        background-color: #242430 !important;
+        color: #e2e8f0 !important;
+        border: 1px solid #3f3f50 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
+        transition: all 0.2s ease-in-out !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+    }
+    
+    /* Hover and Focus animations for Buttons */
+    div[data-testid="stSidebar"] button:hover {
+        background-color: #ff4b4b !important; /* Premium Red Accent */
+        color: #ffffff !important;
+        border-color: #ff4b4b !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 75, 75, 0.2);
+    }
+    
+    /* 4. Chat Input Box Styling */
+    div[data-testid="stChatInput"] textarea {
+        background-color: #1e1e26 !important;
+        color: #ffffff !important;
+        border: 1px solid #3a3a4c !important;
+        border-radius: 10px !important;
+    }
+    
+    /* 5. Custom Card Callout Box */
+    .chef-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+    }
+    </style>
+""", unsafe_allow_html=True)
 # ==========================================
 # 2. Initialize Secure Groq Client
 # ==========================================
