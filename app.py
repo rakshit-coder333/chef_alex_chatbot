@@ -48,7 +48,7 @@ for message in st.session_state.messages:
 # ==========================================
 # 5. React to User Input
 # ==========================================
-if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_chat_input"):
+if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_input_v2"):
     # Display user message and save to history
     st.chat_message("user").markdown(user_query)
     st.session_state.messages.append({"role": "user", "content": user_query})
