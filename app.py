@@ -64,7 +64,7 @@ if user_query := st.chat_input("How do I make a perfect soufflé?", key="chef_ch
         try:
             # Call Hugging Face API natively using a fast Llama 3 model
             response = client.chat.completions.create(
-                model="meta-llama/Meta-Llama-3-8B-Instruct",
+                model="Qwen/Qwen2.5-7B-Instruct",
                 messages=[
                     {"role": "system", "content": "You are Chef Alex, an expert, professional, and helpful culinary assistant."},
                     {"role": "user", "content": user_query}
