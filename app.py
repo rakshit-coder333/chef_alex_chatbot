@@ -10,7 +10,7 @@ load_dotenv()
 
 # Initialize OpenAI client
 client = OpenAI(api_key=st.secrets["GEMINI_API_KEY"],
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+                base_url="https://api-inference.huggingface.co/v1/"
                 )
 
 st.set_page_config(page_title="Chef Alex - Culinary Assistant", page_icon="🍳")
@@ -50,7 +50,7 @@ if user_query := st.chat_input("How do I make a perfect soufflé?", key = "chef_
         try:
             # 3. Call the API using the correct variable name: user_query
             response = client.chat.completions.create(
-                model="gemini-2.5-flash",
+                model="meta-llama/Llama-3.1-8B-Instruct",
                 messages=[
                     {"role": "system", "content": "You are Chef Alex, a helpful and expert culinary assistant."},
                     {"role": "user", "content": user_query}
